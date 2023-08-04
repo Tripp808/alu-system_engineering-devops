@@ -1,22 +1,10 @@
 #!/usr/bin/env bash
+# transfers a file from a client to a server with scp
 
-# Check if all 4 parameters are provided
-if [ "$#" -ne 4 ]; then
-    echo "Usage: $0 PATH_TO_FILE IP USERNAME PATH_TO_SSH_KEY"
-    exit 1
-fi
-
-# Assign parameters to variables
-path_to_file="$1"
-server_ip="$2"
-username="$3"
-path_to_ssh_key="$4"
-
-# Disable strict host key checking
-ssh_options="-o StrictHostKeyChecking=no"
-
-# Transfer the file using scp
-scp $ssh_options -i "$path_to_ssh_key" "$path_to_file" "${username}@${server_ip}:~/"
-
-# Exit with the scp's exit code
-exit $? 
+if [ "$#" -lt 3 ]; then
+   echo "Usage: 0-transfer_file PATH_TO_FILE IP USERNAME PATH_TO_SSH_KEY"
+   elif [ "$#" -lt 4 ]; then
+   	scp -o StrictHostKeyChecking=no "$1" "$3@$2":~/
+	else
+		scp -i "$4" -o StrictHostKeyChecking=no "$1" "$3@$2":~/
+		fi
