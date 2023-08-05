@@ -1,16 +1,32 @@
 #!/usr/bin/env bash
-
-#webserver nginx config
+#configure Nginx with a custom 404 page 'Ceci n'est pas une page'
 sudo apt update
 sudo apt install nginx -y
+sudo touch /var/www/html/index.html
+sudo touch /var/www/html/custom_404.html
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/custom_404.html
+sudo tee /etc/nginx/sites-available/default << EOF
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
 
-# Create a backup of the original configuration file
-sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default_backup
+    root /var/www/html;
+    index index.html;
+    error_page 404 /custom_404.html;
 
-# Replace the configuration using sed
-sudo sed -i 's/listen 80 default_server;/listen 80;/g' /etc/nginx/sites-available/default
-sudo sed -i 's/listen \[::\]:80 default_server;/listen \[::\]:80;/g' /etc/nginx/sites-available/default
-sudo sed -i 's/# Add the X-Served-By header here/add_header X-Served-By $hostname;/g' /etc/nginx/sites-available/default
+    location /redirect_me {
+        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
+    }
 
-# Reload Nginx to apply the changes
-sudo service nginx reload
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+}
+EOF
+server_hostname=$(hostname)
+
+# Modify the Nginx configuration to add the custom header
+sudo sed -i "/server_name _;/a \ \ \ \ add_header X-Served-By $server_hostname;" /etc/nginx/sites-available/default
+
+sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+sudo service nginx restart
