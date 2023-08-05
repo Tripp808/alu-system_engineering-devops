@@ -24,3 +24,4 @@ X-Served-By: 5711-web-02
 ubuntu@5711-web-01:~$ curl -sI 3.85.226.236 | grep X-Served-By
 ubuntu@5711-web-01:~$ sudo service nginx reload
 X-Served-By: 5711-web-01
+sudo service nginx restart
