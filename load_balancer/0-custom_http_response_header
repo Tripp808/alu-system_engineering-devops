@@ -1,28 +1,16 @@
 #!/usr/bin/env bash
+
 #webserver nginx config
 sudo apt update
 sudo apt install nginx -y
-sudo vi /etc/nginx/sites-available/default
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    root /var/www/html;
-    index index.html index.htm index.nginx-debian.html;
-    server_name _;
 
-    # Add the X-Served-By header here
-    add_header X-Served-By $hostname;
+# Create a backup of the original configuration file
+sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default_backup
 
-    location / {
-        # First attempt to serve request as file, then
-        # as directory, then fall back to displaying a 404.
-        try_files $uri $uri/ =404;
-    }
-}
-ubuntu@5711-web-02:~$ curl -sI 52.90.232.233 | grep X-Served-By
-ubuntu@5711-web-02:~$ sudo service nginx reload
-X-Served-By: 5711-web-02
-ubuntu@5711-web-01:~$ curl -sI 3.85.226.236 | grep X-Served-By
-ubuntu@5711-web-01:~$ sudo service nginx reload
-X-Served-By: 5711-web-01
-sudo service nginx restart
+# Replace the configuration using sed
+sudo sed -i 's/listen 80 default_server;/listen 80;/g' /etc/nginx/sites-available/default
+sudo sed -i 's/listen \[::\]:80 default_server;/listen \[::\]:80;/g' /etc/nginx/sites-available/default
+sudo sed -i 's/# Add the X-Served-By header here/add_header X-Served-By $hostname;/g' /etc/nginx/sites-available/default
+
+# Reload Nginx to apply the changes
+sudo service nginx reload
