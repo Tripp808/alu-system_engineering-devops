@@ -1,33 +1,19 @@
 #!/usr/bin/env bash
+#config nginx
 
-# Update the package index and install Nginx
 sudo apt update
 sudo apt install nginx -y
+sudo touch /var/www/html/index.html
 
-sudo vi /etc/nginx/sites-available/default
+echo "Holberton" | sudo tee /var/www/html/index.html
 
-cat <<EOL | sudo tee /etc/nginx/sites-available/default
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    root /var/www/html;
-    index index.html index.htm index.nginx-debian.html;
-    server_name _;
-
-    # Add the X-Served-By header here
-    add_header X-Served-By \$hostname;
-
-    location / {
-        # First attempt to serve request as file, then
-        # as directory, then fall back to displaying a 404.
-        try_files \$uri \$uri/ =404;
-    }
-}
-EOL
 echo "Ceci n'est pas une page" | sudo tee /var/www/html/custom_404.html
 
-Sudo sed  -i “server_name _;/a add_header X-Served-By $HOSTNAME; “ /etc/nginx/sites-enabled/default
+new_string="server_name _;\n\trewrite ^\/redirect_me https:\/\/youtube.com/watch?v=QH2-TGUlwu4\/besthor permanent;"
+
+sudo sed -i "s/server_name _;/$new_string/" /etc/nginx/sites-enabled/default
+
+echo "add_header X-Served-By $HOSTNAME;" | sudo tee -a /etc/nginx/sites-enabled/default
 
 sudo nginx -t
-
-sudo service nginx reload
+sudo service nginx restart
