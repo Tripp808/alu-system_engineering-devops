@@ -24,6 +24,9 @@ server {
     }
 }
 EOL
+echo "Ceci n'est pas une page" | sudo tee /var/www/html/custom_404.html
+
+Sudo sed  -i “server_name _;/a add_header X-Served-By $HOSTNAME; “ /etc/nginx/sites-enabled/default
 
 sudo nginx -t
 
