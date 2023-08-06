@@ -1,31 +1,30 @@
 #!/usr/bin/env bash
-#config nginx
-sudo apt remove --purge nginx nginx-full nginx-common -y
+
+# Update the package index and install Nginx
 sudo apt update
 sudo apt install nginx -y
-sudo touch /var/www/html/index.html
 
-echo "Holberton School" | sudo tee /var/www/html/index.html
-sudo touch /var/www/html/custom_404.html
-echo "Ceci n'est pas une page" | sudo tee /var/www/html/custom_404.html
+sudo vi /etc/nginx/sites-available/default
 
-printf %b 'server {
-        listen 80 default_server;
-        listen [::]:80 default_server;
+cat <<EOL | sudo tee /etc/nginx/sites-available/default
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+    server_name _;
 
-        root /var/www/html;
+    # Add the X-Served-By header here
+    add_header X-Served-By \$hostname;
 
-        index index.html;
-        error_page 404 /custom_404.html;
-
-        server_name _;
-
-        add_header X-Served-By $hostname;
-
-        location /redirect_me {
-            return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4/;
-        }
+    location / {
+        # First attempt to serve request as file, then
+        # as directory, then fall back to displaying a 404.
+        try_files \$uri \$uri/ =404;
+    }
 }
-' | sudo tee /etc/nginx/sites-available/default
+EOL
 
-sudo service nginx restart
+sudo nginx -t
+
+sudo service nginx reload
