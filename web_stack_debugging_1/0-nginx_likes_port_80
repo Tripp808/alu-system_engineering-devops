@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Nginx config
+rm /etc/nginx/sites-enabled/default
+ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+systemctl reload nginx
