@@ -1,5 +1,24 @@
 #!/usr/bin/env bash
-# This script installs Nginx, configures it to listen on port 80,
-rm /etc/nginx/sites-enabled/default
-ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+# This script installs Nginx, configures it to listen on port 80
+# Create a custom configuration for serving HTTP 200
+config_file="/etc/nginx/sites-available/custom_config"
+
+cat <<EOT | sudo tee "$config_file" > /dev/null
+server {
+    listen 80;
+
+    root /usr/share/nginx/html;
+    index index.html index.htm;
+
+    server_name localhost;
+
+    location / {
+        return 200 "Hello, this is a custom response with HTTP 200!";
+    }
+}
+EOT
+
+# Enable the custom configuration
+sudo ln -s "$config_file" "/etc/nginx/sites-enabled/custom_config"
+
 service nginx restart
