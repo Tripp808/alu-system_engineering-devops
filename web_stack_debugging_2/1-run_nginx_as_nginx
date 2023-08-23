@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+# Stop the currently running Nginx process
 service nginx stop
 
 # Update the nginx.conf file to run Nginx as the nginx user
